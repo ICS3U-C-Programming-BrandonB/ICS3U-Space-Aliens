@@ -1,7 +1,8 @@
 # This program is the "Space Aliens" program on the Pybadge
 
-import ugame
+
 import stage
+import ugame
 
 
 def game_scene():
