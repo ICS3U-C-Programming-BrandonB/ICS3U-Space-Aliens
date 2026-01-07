@@ -6,6 +6,57 @@ import ugame
 import constants
 
 
+def menu_scene():
+    # this function is the main menu game_scene
+
+    # image banks for CircuitPython
+    image_bank_background = stage.Bank.from_bmp16("mt_game_studio.bmp")
+
+    # add text objects
+    text = []
+    text1 = stage.Text(
+        width=29, height=12, font=None, palette=constants.RED_PALETTE, buffer=None
+    )
+    text1.move(20, 10)
+    text1.text("MT Game Studios")
+    text.append(text1)
+
+    text2 = stage.Text(
+        width=29, height=12, font=None, palette=constants.RED_PALETTE, buffer=None
+    )
+    text2.move(40, 110)
+    text2.text("PRESS START")
+    text.append(text2)
+
+    # set the background to image 0 in the image bank
+    # and the size (10x8 tiles of size 16x16)
+    background = stage.Grid(
+        image_bank_background, constants.SCREEN_GRID_X, constants.SCREEN_GRID_Y
+    )
+
+    # create a stage for the background to show up on
+    # and set the frame rate to 60fps
+    game = stage.Stage(ugame.display, constants.FPS)
+    # set the layers of all sprites, items show up in order
+    game.layers = text + [background]
+    # render all sprites
+    # most likely you will only render the background once per game scene
+    game.render_block()
+
+    # repeat forever, game loop
+    while True:
+        # get user input
+        keys = ugame.buttons.get_pressed()
+
+        if keys & ugame.K_START != 0:
+            game_scene()
+
+        # update game logic
+
+        # render sprites
+        game.tick()
+
+
 def game_scene():
     # this function is the main game game_scene
 
@@ -103,4 +154,5 @@ def game_scene():
 
 
 if __name__ == "__main__":
+    menu_scene()
     game_scene()
