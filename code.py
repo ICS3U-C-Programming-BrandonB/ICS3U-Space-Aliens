@@ -51,9 +51,6 @@ def menu_scene():
         if keys & ugame.K_START != 0:
             game_scene()
 
-        # update game logic
-
-        # render sprites
         game.tick()
 
 
