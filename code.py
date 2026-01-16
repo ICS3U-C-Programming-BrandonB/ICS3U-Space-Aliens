@@ -1,5 +1,6 @@
 # This program is the "Space Aliens" program on the Pybadge
 
+
 import stage
 import ugame
 import random
@@ -137,6 +138,14 @@ def game_scene():
     score_text.move(1, 1)
     score_text.text("Score: {0}".format(score))
 
+    lives = 3
+
+    lives_text = stage.Text(width=29, height=14)
+    lives_text.clear()
+    lives_text.cursor(0, 0)
+    lives_text.move(100, 1)
+    lives_text.text("Lives: {0}".format(lives))
+
     def show_alien():
         # this function takes an alien from off screen and moves it on screen
         for alien_number in range(len(aliens)):
@@ -216,7 +225,7 @@ def game_scene():
     # and set the frame rate to 60fps
     game = stage.Stage(ugame.display, constants.FPS)
     # set the layers of all sprites, items show up in order
-    game.layers = [score_text] + lasers + [ship] + aliens + [background]
+    game.layers = [score_text, lives_text] + lasers + [ship] + aliens + [background]
     # render all sprites
     # most likely you will only render the background once per game scene
     game.render_block()
@@ -247,15 +256,13 @@ def game_scene():
         if keys & ugame.K_SELECT:
             pass
         if keys & ugame.K_RIGHT:
-            if ship.x < (constants.SCREEN_X - constants.SPRITE_SIZE):
-                ship.move((ship.x + constants.SPRITE_MOVEMENT_SPEED), ship.y)
-            else:
-                ship.move((constants.SCREEN_X - constants.SPRITE_SIZE), ship.y)
+            ship.move((ship.x + constants.SPRITE_MOVEMENT_SPEED), ship.y)
+            if ship.x > constants.SCREEN_X:
+                ship.move(-constants.SPRITE_SIZE, ship.y)
         if keys & ugame.K_LEFT:
-            if ship.x > 0:
-                ship.move((ship.x - constants.SPRITE_MOVEMENT_SPEED), ship.y)
-            else:
-                ship.move(0, ship.y)
+            ship.move((ship.x - constants.SPRITE_MOVEMENT_SPEED), ship.y)
+            if ship.x < -constants.SPRITE_SIZE:
+                ship.move(constants.SCREEN_X, ship.y)
         if keys & ugame.K_UP != 0:
             pass
         if keys & ugame.K_DOWN != 0:
@@ -360,11 +367,25 @@ def game_scene():
                     aliens[alien_number].x + 15,
                     aliens[alien_number].y + 15,
                 ):
-                    # alien hit the ship
                     sound.stop()
                     sound.play(crash_sound)
-                    time.sleep(3.0)
-                    game_over_scene(score)
+
+                    aliens[alien_number].move(
+                        constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y
+                    )
+                    show_alien()
+
+                    lives -= 1
+                    lives_text.clear()
+                    lives_text.cursor(0, 0)
+                    lives_text.move(100, 1)
+                    lives_text.text("Lives: {0}".format(lives))
+                    game.render_block()
+
+                    time.sleep(1.0)
+
+                    if lives == 0:
+                        game_over_scene(score)
 
         # render sprites
         game.render_sprites(lasers + [ship] + aliens)
